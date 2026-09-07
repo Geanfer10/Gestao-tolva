@@ -1,0 +1,165 @@
+{
+  "gerado_em": "2026-09-07",
+  "arquivo_origem": "GESTAO_TOLVA.xlsm",
+  "itens": [
+    {
+      "setor": "MESPACK A 01",
+      "tag": 20661,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK A 02",
+      "tag": 20661,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK A 03",
+      "tag": 20661,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK B 01",
+      "tag": 20662,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK B 02",
+      "tag": 20662,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK B 03",
+      "tag": 20662,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK C 01",
+      "tag": 20663,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20"
+    },
+    {
+      "setor": "MESPACK C 02",
+      "tag": 20663,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20"
+    },
+    {
+      "setor": "MESPACK C 03",
+      "tag": 20663,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20"
+    },
+    {
+      "setor": "MESPACK D 01",
+      "tag": 20664,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK D 02",
+      "tag": 20664,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK D 03",
+      "tag": 20664,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-02-27"
+    },
+    {
+      "setor": "MESPACK E 01",
+      "tag": 20665,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-19"
+    },
+    {
+      "setor": "MESPACK E 02",
+      "tag": 20665,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20"
+    },
+    {
+      "setor": "MESPACK E 03",
+      "tag": 20665,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20"
+    },
+    {
+      "setor": "MESPACK F 01",
+      "tag": 20665,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-06-30"
+    },
+    {
+      "setor": "MESPACK F 02",
+      "tag": 20665,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-06-30"
+    },
+    {
+      "setor": "MESPACK F 03",
+      "tag": 20665,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-06-30"
+    },
+    {
+      "setor": "LINHA PRINCIPAL 01",
+      "tag": 20666,
+      "filtro": "AMH-EL650 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-08-23"
+    },
+    {
+      "setor": "LINHA PRINCIPAL 02",
+      "tag": 20666,
+      "filtro": "AMG-EL650 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-08-23"
+    },
+    {
+      "setor": "LINHA PRINCIPAL 03",
+      "tag": 20666,
+      "filtro": "AFF-EL37B SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-08-23"
+    }
+  ],
+  "estoque_filtros": [
+    {
+      "quantidade": 8,
+      "medida": "500x500x50 mm",
+      "descricao": "Filtros Plissados Classe G4"
+    },
+    {
+      "quantidade": 64,
+      "medida": "595x595x50 mm",
+      "descricao": "Filtros Plissado Mod. 600 Classe G4"
+    }
+  ]
+}

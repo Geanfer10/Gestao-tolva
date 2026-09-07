@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Tolva — Goiás Verde Alimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde: #1E9350;
+    --verde-escuro: #146639;
+    --branco: #ffffff;
+    --cinza-bg: #F4F6F5;
+    --cinza-linha: #E3E8E6;
+    --texto: #1B2622;
+    --texto-suave: #5B6B64;
+
+    --status-pendente: #D93A3A;
+    --status-atencao: #E0A31E;
+    --status-prazo: #1E9350;
+
+    --status-pendente-bg: #FDECEC;
+    --status-atencao-bg: #FDF4E3;
+    --status-prazo-bg: #EAF7EF;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--cinza-bg);
+    color: var(--texto);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  header{
+    background: var(--branco);
+    border-bottom: 3px solid var(--verde);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .marca{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .marca .tag{
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--verde);
+  }
+
+  h1{
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  h1 span{
+    color: var(--verde-escuro);
+  }
+
+  .subtitulo{
+    font-size: 13px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+
+  .relogio{
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .relogio .data{
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .relogio .atualizado{
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+
+  main{
+    padding: 28px 40px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* KPIs */
+  .kpis{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .kpi{
+    background: var(--branco);
+    border-radius: 10px;
+    padding: 20px 24px;
+    border-left: 6px solid var(--cinza-linha);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kpi.pendente{ border-left-color: var(--status-pendente); }
+  .kpi.atencao{ border-left-color: var(--status-atencao); }
+  .kpi.prazo{ border-left-color: var(--status-prazo); }
+
+  .kpi-num{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .kpi.pendente .kpi-num{ color: var(--status-pendente); }
+  .kpi.atencao .kpi-num{ color: var(--status-atencao); }
+  .kpi.prazo .kpi-num{ color: var(--status-prazo); }
+
+  .kpi-label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    text-align: right;
+  }
+
+  /* Tabela */
+  .painel{
+    background: var(--branco);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .painel-titulo{
+    padding: 16px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--cinza-linha);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th{
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--texto-suave);
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--cinza-linha);
+    font-weight: 600;
+  }
+
+  td{
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--cinza-linha);
+    font-size: 14px;
+  }
+
+  tr:last-child td{ border-bottom: none; }
+
+  tr.linha-pendente{ background: var(--status-pendente-bg); }
+  tr.linha-atencao{ background: var(--status-atencao-bg); }
+
+  .setor-nome{ font-weight: 600; }
+  .setor-tag{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--texto-suave);
+  }
+
+  .num{
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .dias-num{
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .badge::before{
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .badge.pendente{ background: var(--status-pendente-bg); color: var(--status-pendente); }
+  .badge.pendente::before{ background: var(--status-pendente); }
+
+  .badge.atencao{ background: var(--status-atencao-bg); color: var(--status-atencao); }
+  .badge.atencao::before{ background: var(--status-atencao); }
+
+  .badge.prazo{ background: var(--status-prazo-bg); color: var(--status-prazo); }
+  .badge.prazo::before{ background: var(--status-prazo); }
+
+  /* Estoque */
+  .estoque-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--cinza-linha);
+  }
+
+  .estoque-item{
+    background: var(--branco);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .estoque-desc{
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .estoque-medida{
+    font-size: 12px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+
+  .estoque-qtd{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--verde-escuro);
+  }
+
+  footer{
+    text-align: center;
+    font-size: 12px;
+    color: var(--texto-suave);
+    padding: 20px;
+  }
+
+  .erro{
+    background: var(--status-pendente-bg);
+    color: var(--status-pendente);
+    padding: 16px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px){
+    .kpis{ grid-template-columns: 1fr; }
+    header{ flex-direction: column; align-items: flex-start; gap: 10px; }
+    main{ padding: 20px; }
+    th:nth-child(4), td:nth-child(4){ display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="marca">
+    <span class="tag"></span>
+    <div>
+      <h1>Gestão de <span>Tolva</span></h1>
+      <div class="subtitulo">Controle de troca de filtros — Goiás Verde Alimentos</div>
+    </div>
+  </div>
+  <div class="relogio">
+    <div class="data" id="data-hoje">—</div>
+    <div class="atualizado" id="dado-atualizado">carregando...</div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="kpis">
+    <div class="kpi pendente">
+      <div class="kpi-num" id="kpi-pendente">0</div>
+      <div class="kpi-label">PENDENTE</div>
+    </div>
+    <div class="kpi atencao">
+      <div class="kpi-num" id="kpi-atencao">0</div>
+      <div class="kpi-label">ATENÇÃO</div>
+    </div>
+    <div class="kpi prazo">
+      <div class="kpi-num" id="kpi-prazo">0</div>
+      <div class="kpi-label">DENTRO DO PRAZO</div>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="painel-titulo">Troca de filtros por setor</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Setor</th>
+          <th>Filtro</th>
+          <th>Última troca</th>
+          <th>Próxima troca</th>
+          <th>Dias restantes</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-corpo"></tbody>
+    </table>
+  </div>
+
+  <div class="painel" id="painel-estoque" style="display:none;">
+    <div class="painel-titulo">Estoque de filtros</div>
+    <div class="estoque-grid" id="estoque-corpo"></div>
+  </div>
+</main>
+
+<footer>Atualizado automaticamente todos os dias · dados carregados de <code>data/latest.json</code></footer>
+
+<script>
+const FREQ_PENDENTE = 2;   // dias restantes < 2  -> PENDENTE
+const FREQ_PRAZO = 20;     // dias restantes >= 20 -> DENTRO DO PRAZO
+
+function parseISODate(iso){
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function addDias(date, dias){
+  const r = new Date(date);
+  r.setDate(r.getDate() + dias);
+  return r;
+}
+
+function diffDias(a, b){
+  const ms = a.setHours(0,0,0,0) - b.setHours(0,0,0,0);
+  return Math.round(ms / 86400000);
+}
+
+function formatarData(date){
+  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function statusDe(diasRestantes){
+  if (diasRestantes < FREQ_PENDENTE) return 'pendente';
+  if (diasRestantes >= FREQ_PRAZO) return 'prazo';
+  return 'atencao';
+}
+
+function statusLabel(status){
+  return { pendente: 'PENDENTE', atencao: 'ATENÇÃO', prazo: 'DENTRO DO PRAZO' }[status];
+}
+
+async function carregar(){
+  document.getElementById('data-hoje').textContent = formatarData(new Date());
+
+  let payload;
+  try{
+    const resp = await fetch('data/latest.json?_=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    payload = await resp.json();
+  }catch(e){
+    document.getElementById('main').innerHTML =
+      '<div class="erro">Não foi possível carregar os dados (data/latest.json). ' +
+      'Verifique se o arquivo já foi processado pelo GitHub Actions.</div>';
+    return;
+  }
+
+  const hoje = new Date();
+  document.getElementById('dado-atualizado').textContent =
+    'planilha de ' + formatarData(parseISODate(payload.gerado_em));
+
+  const linhas = payload.itens.map(item => {
+    const ultima = parseISODate(item.ultima_troca);
+    const proxima = addDias(ultima, item.frequencia_dias);
+    const diasRestantes = diffDias(new Date(proxima), new Date(hoje));
+    const status = statusDe(diasRestantes);
+    return { ...item, ultima, proxima, diasRestantes, status };
+  });
+
+  // contadores
+  const contagem = { pendente: 0, atencao: 0, prazo: 0 };
+  linhas.forEach(l => contagem[l.status]++);
+  document.getElementById('kpi-pendente').textContent = contagem.pendente;
+  document.getElementById('kpi-atencao').textContent = contagem.atencao;
+  document.getElementById('kpi-prazo').textContent = contagem.prazo;
+
+  // ordena: mais urgente primeiro
+  linhas.sort((a, b) => a.diasRestantes - b.diasRestantes);
+
+  const corpo = document.getElementById('tabela-corpo');
+  corpo.innerHTML = linhas.map(l => `
+    <tr class="${l.status === 'pendente' ? 'linha-pendente' : l.status === 'atencao' ? 'linha-atencao' : ''}">
+      <td>
+        <div class="setor-nome">${l.setor}</div>
+        ${l.tag ? `<div class="setor-tag">TAG ${l.tag}</div>` : ''}
+      </td>
+      <td>${l.filtro || '—'}</td>
+      <td class="num">${formatarData(l.ultima)}</td>
+      <td class="num">${formatarData(l.proxima)}</td>
+      <td class="dias-num" style="color: var(--status-${l.status === 'prazo' ? 'prazo' : l.status});">
+        ${l.diasRestantes}
+      </td>
+      <td><span class="badge ${l.status}">${statusLabel(l.status)}</span></td>
+    </tr>
+  `).join('');
+
+  // estoque (se houver)
+  if (payload.estoque_filtros && payload.estoque_filtros.length){
+    document.getElementById('painel-estoque').style.display = '';
+    document.getElementById('estoque-corpo').innerHTML = payload.estoque_filtros.map(e => `
+      <div class="estoque-item">
+        <div>
+          <div class="estoque-desc">${e.descricao || '—'}</div>
+          <div class="estoque-medida">${e.medida || ''}</div>
+        </div>
+        <div class="estoque-qtd">${e.quantidade ?? '—'}</div>
+      </div>
+    `).join('');
+  }
+}
+
+carregar();
+// recalcula status à meia-noite sem precisar reprocessar o Excel
+setInterval(carregar, 1000 * 60 * 60); // re-verifica a cada hora
+</script>
+
+</body>
+</html>
