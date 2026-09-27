@@ -1,0 +1,149 @@
+[
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK A 01",
+    "grupo": "MESPACK A",
+    "filtro": "AMH-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK A 02",
+    "grupo": "MESPACK A",
+    "filtro": "AMF-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK A 03",
+    "grupo": "MESPACK A",
+    "filtro": "AM-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK B 01",
+    "grupo": "MESPACK B",
+    "filtro": "AMH-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK B 02",
+    "grupo": "MESPACK B",
+    "filtro": "AMF-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK B 03",
+    "grupo": "MESPACK B",
+    "filtro": "AM-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK D 01",
+    "grupo": "MESPACK D",
+    "filtro": "AMH-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK D 02",
+    "grupo": "MESPACK D",
+    "filtro": "AMF-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-02-27",
+    "setor": "MESPACK D 03",
+    "grupo": "MESPACK D",
+    "filtro": "AM-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-04-19",
+    "setor": "MESPACK E 01",
+    "grupo": "MESPACK E",
+    "filtro": "AMH-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-04-20",
+    "setor": "MESPACK C 01",
+    "grupo": "MESPACK C",
+    "filtro": "AMH-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-04-20",
+    "setor": "MESPACK C 02",
+    "grupo": "MESPACK C",
+    "filtro": "AMF-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-04-20",
+    "setor": "MESPACK C 03",
+    "grupo": "MESPACK C",
+    "filtro": "AM-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-04-20",
+    "setor": "MESPACK E 02",
+    "grupo": "MESPACK E",
+    "filtro": "AMF-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-04-20",
+    "setor": "MESPACK E 03",
+    "grupo": "MESPACK E",
+    "filtro": "AM-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-06-30",
+    "setor": "MESPACK F 01",
+    "grupo": "MESPACK F",
+    "filtro": "AMH-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-06-30",
+    "setor": "MESPACK F 02",
+    "grupo": "MESPACK F",
+    "filtro": "AMF-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-06-30",
+    "setor": "MESPACK F 03",
+    "grupo": "MESPACK F",
+    "filtro": "AM-EL350 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-08-23",
+    "setor": "LINHA PRINCIPAL 01",
+    "grupo": "LINHA PRINCIPAL",
+    "filtro": "AMH-EL650 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-08-23",
+    "setor": "LINHA PRINCIPAL 02",
+    "grupo": "LINHA PRINCIPAL",
+    "filtro": "AMG-EL650 SMC",
+    "registrado_em": "2026-09-27"
+  },
+  {
+    "data_troca": "2026-08-23",
+    "setor": "LINHA PRINCIPAL 03",
+    "grupo": "LINHA PRINCIPAL",
+    "filtro": "AFF-EL37B SMC",
+    "registrado_em": "2026-09-27"
+  }
+]
