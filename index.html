@@ -102,13 +102,7 @@
   .ticker-track{
     display: inline-flex;
     align-items: center;
-    animation: rolar 45s linear infinite;
     will-change: transform;
-  }
-
-  @keyframes rolar{
-    0%{ transform: translateX(0); }
-    100%{ transform: translateX(-50%); }
   }
 
   .ticker-item{
@@ -141,9 +135,6 @@
   .ticker-val.atencao{ color: var(--status-atencao); }
   .ticker-val.prazo{ color: #67D794; }
 
-  @media (prefers-reduced-motion: reduce){
-    .ticker-track{ animation: none; overflow-x: auto; }
-  }
 
   main{
     padding: 28px 40px 48px;
@@ -616,6 +607,35 @@ function montarTicker(linhas, contagem, gerado_em){
   const html = itens.join('');
   // duplica o conteúdo pra rolagem contínua sem "salto"
   document.getElementById('ticker-track').innerHTML = html + html;
+  iniciarRolagemTicker();
+}
+
+// Rolagem feita em JavaScript (não depende de animação CSS, então funciona
+// mesmo com "reduzir animações" ativado no Windows ou em navegadores de TV)
+const TICKER_VELOCIDADE_PX_POR_SEG = 60;
+let tickerPosicao = 0;
+let tickerUltimoTempo = null;
+let tickerRodando = false;
+
+function iniciarRolagemTicker(){
+  tickerPosicao = 0;
+  tickerUltimoTempo = null;
+  if (tickerRodando) return;
+  tickerRodando = true;
+  requestAnimationFrame(passoTicker);
+}
+
+function passoTicker(tempo){
+  const track = document.getElementById('ticker-track');
+  if (tickerUltimoTempo !== null){
+    const dt = (tempo - tickerUltimoTempo) / 1000;
+    tickerPosicao -= TICKER_VELOCIDADE_PX_POR_SEG * dt;
+    const metade = track.scrollWidth / 2;
+    if (metade > 0 && -tickerPosicao >= metade) tickerPosicao += metade;
+    track.style.transform = `translateX(${tickerPosicao}px)`;
+  }
+  tickerUltimoTempo = tempo;
+  requestAnimationFrame(passoTicker);
 }
 
 function montarGrupos(linhas){
