@@ -171,16 +171,31 @@
       "ultima_troca": "2026-08-23"
     }
   ],
-  "estoque_filtros": [
+  "estoque_por_modelo": [
     {
-      "quantidade": 8,
-      "medida": "500x500x50 mm",
-      "descricao": "Filtros Plissados Classe G4"
+      "modelo": "AMH-EL350 SMC",
+      "quantidade": 1
     },
     {
-      "quantidade": 64,
-      "medida": "595x595x50 mm",
-      "descricao": "Filtros Plissado Mod. 600 Classe G4"
+      "modelo": "AMF-EL350 SMC",
+      "quantidade": 1
+    },
+    {
+      "modelo": "AM-EL350 SMC",
+      "quantidade": 1
+    },
+    {
+      "modelo": "AMH-EL650 SMC",
+      "quantidade": null
+    },
+    {
+      "modelo": "AMG-EL650 SMC",
+      "quantidade": null
+    },
+    {
+      "modelo": "AFF-EL37B SMC",
+      "quantidade": null
     }
-  ]
+  ],
+  "estoque_origem": "manual"
 }
