@@ -367,38 +367,27 @@
   .badge-mini.atencao{ background: var(--status-atencao); }
   .badge-mini.prazo{ background: var(--status-prazo); }
 
-  /* Estoque */
-  .estoque-grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--cinza-linha);
-  }
-
-  .estoque-item{
-    background: var(--branco);
-    padding: 18px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .estoque-desc{
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .estoque-medida{
-    font-size: 12px;
-    color: var(--texto-suave);
-    margin-top: 2px;
-  }
-
+  /* Estoque por modelo */
   .estoque-qtd{
     font-family: 'JetBrains Mono', monospace;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
-    color: var(--verde-escuro);
+  }
+
+  .estoque-qtd.vazio{
+    color: var(--texto-suave);
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .badge.sem-info{ background: var(--cinza-bg); color: var(--texto-suave); }
+  .badge.sem-info::before{ background: #A7B3AE; }
+
+  .estoque-nota{
+    padding: 12px 24px;
+    font-size: 12px;
+    color: var(--texto-suave);
+    border-top: 1px solid var(--cinza-linha);
   }
 
   /* Gráfico de histórico */
@@ -533,8 +522,23 @@
   </div>
 
   <div class="painel" id="painel-estoque" style="display:none;">
-    <div class="painel-titulo">Estoque de filtros</div>
-    <div class="estoque-grid" id="estoque-corpo"></div>
+    <div class="painel-titulo">
+      <span>Estoque de filtros por modelo</span>
+      <span class="contagem">trocas previstas nos próximos 30 dias</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Usado em</th>
+          <th>Em estoque</th>
+          <th>Trocas previstas</th>
+          <th>Situação</th>
+        </tr>
+      </thead>
+      <tbody id="estoque-corpo"></tbody>
+    </table>
+    <div class="estoque-nota" id="estoque-nota"></div>
   </div>
 </main>
 
@@ -582,7 +586,7 @@ function piorStatus(statuses){
   return 'prazo';
 }
 
-function montarTicker(linhas, contagem, gerado_em){
+function montarTicker(linhas, contagem, gerado_em, analiseEstoque){
   const itens = [];
 
   itens.push(`<span class="ticker-item"><span class="ticker-dot info"></span>GESTÃO DE TOLVA — dados da planilha de ${formatarData(parseISODate(gerado_em))}</span>`);
@@ -603,6 +607,10 @@ function montarTicker(linhas, contagem, gerado_em){
   if (urgentes.length === 0){
     itens.push(`<span class="ticker-item"><span class="ticker-dot prazo"></span>Nenhum item pendente ou em atenção no momento ✓</span>`);
   }
+
+  (analiseEstoque || []).filter(m => m.situacao === 'falta').forEach(m => {
+    itens.push(`<span class="ticker-item"><span class="ticker-dot pendente"></span>ESTOQUE ${m.modelo} — <span class="ticker-val pendente">${m.quantidade} em estoque, ${m.previstas} trocas previstas</span></span>`);
+  });
 
   const html = itens.join('');
   // duplica o conteúdo pra rolagem contínua sem "salto"
@@ -755,24 +763,87 @@ async function montarHistorico(){
   document.getElementById('painel-historico').style.display = '';
 }
 
-function montarAlertaEstoque(linhas, estoque){
-  if (!estoque || estoque.length === 0) return;
+// "AMH-EL350 SMC", "amh-el350", "AMH-EL350  SMC" -> "AMH-EL350"
+function chaveModelo(nome){
+  return String(nome || '').toUpperCase().replace(/\s+/g, ' ').replace(/\s*SMC$/, '').trim();
+}
 
-  const totalEstoque = estoque.reduce((soma, e) => soma + (Number(e.quantidade) || 0), 0);
-  const trocasProximos30Dias = linhas.filter(l => l.diasRestantes <= JANELA_ESTOQUE_DIAS).length;
+// Cruza, para cada modelo de filtro, o estoque com as trocas dos próximos 30 dias
+function analisarEstoque(linhas, estoque){
+  const porModelo = {};
 
-  if (trocasProximos30Dias === 0) return;
+  linhas.forEach(l => {
+    const k = chaveModelo(l.filtro);
+    if (!k) return;
+    if (!porModelo[k]) porModelo[k] = { modelo: l.filtro, quantidade: null, previstas: 0, grupos: new Set() };
+    porModelo[k].grupos.add(l.grupo);
+    if (l.diasRestantes <= JANELA_ESTOQUE_DIAS) porModelo[k].previstas++;
+  });
 
+  (estoque || []).forEach(e => {
+    const k = chaveModelo(e.modelo);
+    if (!k) return;
+    if (!porModelo[k]) porModelo[k] = { modelo: e.modelo, quantidade: null, previstas: 0, grupos: new Set() };
+    porModelo[k].quantidade = (e.quantidade === null || e.quantidade === undefined || e.quantidade === '')
+      ? null : Number(e.quantidade);
+  });
+
+  return Object.values(porModelo).map(m => {
+    let situacao;
+    if (m.quantidade === null) situacao = 'sem_info';
+    else if (m.quantidade < m.previstas) situacao = 'falta';
+    else situacao = 'ok';
+    return { ...m, grupos: [...m.grupos].sort(), faltam: Math.max(m.previstas - (m.quantidade || 0), 0), situacao };
+  }).sort((a, b) => {
+    const ordem = { falta: 0, ok: 1, sem_info: 2 };
+    if (ordem[a.situacao] !== ordem[b.situacao]) return ordem[a.situacao] - ordem[b.situacao];
+    return a.modelo.localeCompare(b.modelo);
+  });
+}
+
+function montarAlertaEstoque(analise){
   const el = document.getElementById('alerta-estoque');
   const texto = document.getElementById('alerta-estoque-texto');
+  const emFalta = analise.filter(m => m.situacao === 'falta');
 
-  if (totalEstoque < trocasProximos30Dias){
-    el.classList.add('critico');
-    texto.innerHTML = `Estoque pode não ser suficiente: há <b>${trocasProximos30Dias}</b> troca(s) prevista(s) para os próximos ${JANELA_ESTOQUE_DIAS} dias, mas o estoque atual soma <b>${totalEstoque}</b> filtro(s). <br><span style="font-size:11px;opacity:0.8;">Estimativa aproximada — considera o total de filtros em estoque, sem diferenciar por medida/modelo.</span>`;
-  } else {
-    texto.innerHTML = `<b>${trocasProximos30Dias}</b> troca(s) prevista(s) para os próximos ${JANELA_ESTOQUE_DIAS} dias · estoque atual: <b>${totalEstoque}</b> filtro(s).`;
+  if (emFalta.length === 0){
+    el.style.display = 'none';
+    return;
   }
+
+  el.classList.add('critico');
+  texto.innerHTML = `Estoque insuficiente para as trocas dos próximos ${JANELA_ESTOQUE_DIAS} dias: ` +
+    emFalta.map(m => `<b>${m.modelo}</b> (${m.quantidade} em estoque, ${m.previstas} troca(s) prevista(s))`).join(' · ');
   el.style.display = 'flex';
+}
+
+function montarPainelEstoque(analise, origem){
+  if (analise.length === 0) return;
+
+  const rotulo = { falta: 'FALTA', ok: 'SUFICIENTE', sem_info: 'SEM INFORMAÇÃO' };
+  const classe = { falta: 'pendente', ok: 'prazo', sem_info: 'sem-info' };
+
+  document.getElementById('estoque-corpo').innerHTML = analise.map(m => `
+    <tr class="${m.situacao === 'falta' ? 'linha-pendente' : ''}">
+      <td class="setor-nome">${m.modelo}</td>
+      <td class="setor-tag">${m.grupos.join(', ') || '—'}</td>
+      <td>${m.quantidade === null
+        ? '<span class="estoque-qtd vazio">não informado</span>'
+        : `<span class="estoque-qtd">${m.quantidade}</span>`}</td>
+      <td class="num">${m.previstas}</td>
+      <td><span class="badge ${classe[m.situacao]}">${rotulo[m.situacao]}${m.situacao === 'falta' ? ` · faltam ${m.faltam}` : ''}</span></td>
+    </tr>
+  `).join('');
+
+  const semInfo = analise.filter(m => m.situacao === 'sem_info').length;
+  const nota = [];
+  nota.push(origem === 'planilha'
+    ? 'Estoque lido da aba ESTOQUE da planilha.'
+    : 'Estoque informado manualmente (ainda não está na planilha).');
+  if (semInfo) nota.push(`${semInfo} modelo(s) sem quantidade informada.`);
+  document.getElementById('estoque-nota').textContent = nota.join(' ');
+
+  document.getElementById('painel-estoque').style.display = '';
 }
 
 async function carregar(){
@@ -810,23 +881,13 @@ async function carregar(){
 
   const linhasOrdenadas = [...linhas].sort((a, b) => a.diasRestantes - b.diasRestantes);
 
-  montarTicker(linhasOrdenadas, contagem, payload.gerado_em);
-  montarGrupos(linhas);
-  montarAlertaEstoque(linhas, payload.estoque_filtros);
-  montarHistorico();
+  const analiseEstoque = analisarEstoque(linhas, payload.estoque_por_modelo);
 
-  if (payload.estoque_filtros && payload.estoque_filtros.length){
-    document.getElementById('painel-estoque').style.display = '';
-    document.getElementById('estoque-corpo').innerHTML = payload.estoque_filtros.map(e => `
-      <div class="estoque-item">
-        <div>
-          <div class="estoque-desc">${e.descricao || '—'}</div>
-          <div class="estoque-medida">${e.medida || ''}</div>
-        </div>
-        <div class="estoque-qtd">${e.quantidade ?? '—'}</div>
-      </div>
-    `).join('');
-  }
+  montarTicker(linhasOrdenadas, contagem, payload.gerado_em, analiseEstoque);
+  montarGrupos(linhas);
+  montarAlertaEstoque(analiseEstoque);
+  montarPainelEstoque(analiseEstoque, payload.estoque_origem);
+  montarHistorico();
 }
 
 carregar();
