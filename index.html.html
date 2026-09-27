@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Tolva — Goiás Verde Alimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde: #1E9350;
+    --verde-escuro: #146639;
+    --branco: #ffffff;
+    --cinza-bg: #F4F6F5;
+    --cinza-linha: #E3E8E6;
+    --texto: #1B2622;
+    --texto-suave: #5B6B64;
+
+    --status-pendente: #D93A3A;
+    --status-atencao: #E0A31E;
+    --status-prazo: #1E9350;
+
+    --status-pendente-bg: #FDECEC;
+    --status-atencao-bg: #FDF4E3;
+    --status-prazo-bg: #EAF7EF;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--cinza-bg);
+    color: var(--texto);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+
+  header{
+    background: var(--branco);
+    border-bottom: 3px solid var(--verde);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .marca{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .marca .tag{
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--verde);
+  }
+
+  h1{
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  h1 span{
+    color: var(--verde-escuro);
+  }
+
+  .subtitulo{
+    font-size: 13px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+
+  .relogio{
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .relogio .data{
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .relogio .atualizado{
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+
+  /* ---- Ticker (faixa rolante) ---- */
+  .ticker-wrap{
+    background: #101815;
+    overflow: hidden;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--verde);
+    position: relative;
+  }
+
+  .ticker-track{
+    display: inline-flex;
+    align-items: center;
+    animation: rolar 45s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes rolar{
+    0%{ transform: translateX(0); }
+    100%{ transform: translateX(-50%); }
+  }
+
+  .ticker-item{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: #E7ECEA;
+    border-right: 1px solid rgba(255,255,255,0.12);
+    white-space: nowrap;
+  }
+
+  .ticker-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .ticker-dot.pendente{ background: var(--status-pendente); }
+  .ticker-dot.atencao{ background: var(--status-atencao); }
+  .ticker-dot.prazo{ background: var(--status-prazo); }
+  .ticker-dot.info{ background: #4B9BFF; }
+
+  .ticker-val{ font-weight: 700; }
+  .ticker-val.pendente{ color: var(--status-pendente); }
+  .ticker-val.atencao{ color: var(--status-atencao); }
+  .ticker-val.prazo{ color: #67D794; }
+
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{ animation: none; overflow-x: auto; }
+  }
+
+  main{
+    padding: 28px 40px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* KPIs */
+  .kpis{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .kpi{
+    background: var(--branco);
+    border-radius: 10px;
+    padding: 20px 24px;
+    border-left: 6px solid var(--cinza-linha);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kpi.pendente{ border-left-color: var(--status-pendente); }
+  .kpi.atencao{ border-left-color: var(--status-atencao); }
+  .kpi.prazo{ border-left-color: var(--status-prazo); }
+
+  .kpi-num{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .kpi.pendente .kpi-num{ color: var(--status-pendente); }
+  .kpi.atencao .kpi-num{ color: var(--status-atencao); }
+  .kpi.prazo .kpi-num{ color: var(--status-prazo); }
+
+  .kpi-label{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    text-align: right;
+  }
+
+  /* Alerta de estoque */
+  .alerta-estoque{
+    display: none;
+    align-items: center;
+    gap: 14px;
+    background: var(--status-atencao-bg);
+    border: 1px solid #F0D8A0;
+    color: #7A5B0E;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  .alerta-estoque.critico{
+    background: var(--status-pendente-bg);
+    border-color: #F0B8B8;
+    color: #8C2A2A;
+  }
+
+  .alerta-estoque .icone{
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .alerta-estoque b{ font-weight: 700; }
+
+  /* Painéis */
+  .painel{
+    background: var(--branco);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .painel-titulo{
+    padding: 16px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--cinza-linha);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .painel-titulo .contagem{
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--texto-suave);
+  }
+
+  /* Grupos (equipamentos) */
+  .grupo{
+    border-bottom: 1px solid var(--cinza-linha);
+  }
+
+  .grupo:last-child{ border-bottom: none; }
+
+  .grupo-cabecalho{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    cursor: pointer;
+    user-select: none;
+    gap: 16px;
+  }
+
+  .grupo-cabecalho:hover{ background: var(--cinza-bg); }
+
+  .grupo-titulo{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .grupo-seta{
+    font-size: 11px;
+    color: var(--texto-suave);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .grupo.aberto .grupo-seta{ transform: rotate(90deg); }
+
+  .grupo-resumo{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--texto-suave);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .grupo-corpo{
+    display: none;
+  }
+
+  .grupo.aberto .grupo-corpo{ display: block; }
+
+  table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th{
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--texto-suave);
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--cinza-linha);
+    font-weight: 600;
+    background: var(--cinza-bg);
+  }
+
+  td{
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--cinza-linha);
+    font-size: 14px;
+  }
+
+  tbody tr:last-child td{ border-bottom: none; }
+
+  tr.linha-pendente{ background: var(--status-pendente-bg); }
+  tr.linha-atencao{ background: var(--status-atencao-bg); }
+
+  .setor-nome{ font-weight: 600; }
+  .setor-tag{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--texto-suave);
+  }
+
+  .num{
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .dias-num{
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .badge::before{
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .badge.pendente{ background: var(--status-pendente-bg); color: var(--status-pendente); }
+  .badge.pendente::before{ background: var(--status-pendente); }
+
+  .badge.atencao{ background: var(--status-atencao-bg); color: var(--status-atencao); }
+  .badge.atencao::before{ background: var(--status-atencao); }
+
+  .badge.prazo{ background: var(--status-prazo-bg); color: var(--status-prazo); }
+  .badge.prazo::before{ background: var(--status-prazo); }
+
+  .badge-mini{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .badge-mini.pendente{ background: var(--status-pendente); }
+  .badge-mini.atencao{ background: var(--status-atencao); }
+  .badge-mini.prazo{ background: var(--status-prazo); }
+
+  /* Estoque */
+  .estoque-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--cinza-linha);
+  }
+
+  .estoque-item{
+    background: var(--branco);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .estoque-desc{
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .estoque-medida{
+    font-size: 12px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+
+  .estoque-qtd{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--verde-escuro);
+  }
+
+  /* Gráfico de histórico */
+  .grafico-corpo{
+    padding: 24px;
+  }
+
+  .grafico-vazio{
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: 13px;
+  }
+
+  .grafico-barras{
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 160px;
+    padding-top: 10px;
+  }
+
+  .barra-col{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 6px;
+  }
+
+  .barra{
+    width: 100%;
+    max-width: 42px;
+    background: var(--verde);
+    border-radius: 4px 4px 0 0;
+    min-height: 3px;
+    position: relative;
+  }
+
+  .barra-valor{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--verde-escuro);
+  }
+
+  .barra-label{
+    font-size: 11px;
+    color: var(--texto-suave);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  footer{
+    text-align: center;
+    font-size: 12px;
+    color: var(--texto-suave);
+    padding: 20px;
+  }
+
+  .erro{
+    background: var(--status-pendente-bg);
+    color: var(--status-pendente);
+    padding: 16px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px){
+    .kpis{ grid-template-columns: 1fr; }
+    header{ flex-direction: column; align-items: flex-start; gap: 10px; }
+    main{ padding: 20px; }
+    th:nth-child(4), td:nth-child(4){ display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="marca">
+    <span class="tag"></span>
+    <div>
+      <h1>Gestão de <span>Tolva</span></h1>
+      <div class="subtitulo">Controle de troca de filtros — Goiás Verde Alimentos</div>
+    </div>
+  </div>
+  <div class="relogio">
+    <div class="data" id="data-hoje">—</div>
+    <div class="atualizado" id="dado-atualizado">carregando...</div>
+  </div>
+</header>
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<main id="main">
+  <div class="kpis">
+    <div class="kpi pendente">
+      <div class="kpi-num" id="kpi-pendente">0</div>
+      <div class="kpi-label">PENDENTE</div>
+    </div>
+    <div class="kpi atencao">
+      <div class="kpi-num" id="kpi-atencao">0</div>
+      <div class="kpi-label">ATENÇÃO</div>
+    </div>
+    <div class="kpi prazo">
+      <div class="kpi-num" id="kpi-prazo">0</div>
+      <div class="kpi-label">DENTRO DO PRAZO</div>
+    </div>
+  </div>
+
+  <div class="alerta-estoque" id="alerta-estoque">
+    <span class="icone">⚠️</span>
+    <span id="alerta-estoque-texto"></span>
+  </div>
+
+  <div class="painel">
+    <div class="painel-titulo">
+      <span>Troca de filtros por equipamento</span>
+      <span class="contagem" id="contagem-grupos"></span>
+    </div>
+    <div id="grupos-corpo"></div>
+  </div>
+
+  <div class="painel" id="painel-historico" style="display:none;">
+    <div class="painel-titulo">Trocas realizadas por mês</div>
+    <div class="grafico-corpo" id="grafico-corpo"></div>
+  </div>
+
+  <div class="painel" id="painel-estoque" style="display:none;">
+    <div class="painel-titulo">Estoque de filtros</div>
+    <div class="estoque-grid" id="estoque-corpo"></div>
+  </div>
+</main>
+
+<footer>Atualizado automaticamente todos os dias · dados carregados de <code>data/latest.json</code></footer>
+
+<script>
+const FREQ_PENDENTE = 2;   // dias restantes < 2  -> PENDENTE
+const FREQ_PRAZO = 20;     // dias restantes >= 20 -> DENTRO DO PRAZO
+const JANELA_ESTOQUE_DIAS = 30; // horizonte considerado no alerta de estoque
+
+function parseISODate(iso){
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function addDias(date, dias){
+  const r = new Date(date);
+  r.setDate(r.getDate() + dias);
+  return r;
+}
+
+function diffDias(a, b){
+  const ms = a.setHours(0,0,0,0) - b.setHours(0,0,0,0);
+  return Math.round(ms / 86400000);
+}
+
+function formatarData(date){
+  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function statusDe(diasRestantes){
+  if (diasRestantes < FREQ_PENDENTE) return 'pendente';
+  if (diasRestantes >= FREQ_PRAZO) return 'prazo';
+  return 'atencao';
+}
+
+function statusLabel(status){
+  return { pendente: 'PENDENTE', atencao: 'ATENÇÃO', prazo: 'DENTRO DO PRAZO' }[status];
+}
+
+// pior status entre um conjunto: pendente > atencao > prazo
+function piorStatus(statuses){
+  if (statuses.includes('pendente')) return 'pendente';
+  if (statuses.includes('atencao')) return 'atencao';
+  return 'prazo';
+}
+
+function montarTicker(linhas, contagem, gerado_em){
+  const itens = [];
+
+  itens.push(`<span class="ticker-item"><span class="ticker-dot info"></span>GESTÃO DE TOLVA — dados da planilha de ${formatarData(parseISODate(gerado_em))}</span>`);
+
+  itens.push(`<span class="ticker-item"><span class="ticker-dot pendente"></span>PENDENTE <span class="ticker-val pendente">${contagem.pendente}</span></span>`);
+  itens.push(`<span class="ticker-item"><span class="ticker-dot atencao"></span>ATENÇÃO <span class="ticker-val atencao">${contagem.atencao}</span></span>`);
+  itens.push(`<span class="ticker-item"><span class="ticker-dot prazo"></span>DENTRO DO PRAZO <span class="ticker-val prazo">${contagem.prazo}</span></span>`);
+
+  // itens mais urgentes (pendentes e em atenção), ordenados
+  const urgentes = linhas.filter(l => l.status !== 'prazo').slice(0, 8);
+  urgentes.forEach(l => {
+    const dias = l.diasRestantes < 0
+      ? `${Math.abs(l.diasRestantes)}d ATRASADO`
+      : `${l.diasRestantes}d restantes`;
+    itens.push(`<span class="ticker-item"><span class="ticker-dot ${l.status}"></span>${l.setor} — <span class="ticker-val ${l.status}">${dias}</span></span>`);
+  });
+
+  if (urgentes.length === 0){
+    itens.push(`<span class="ticker-item"><span class="ticker-dot prazo"></span>Nenhum item pendente ou em atenção no momento ✓</span>`);
+  }
+
+  const html = itens.join('');
+  // duplica o conteúdo pra rolagem contínua sem "salto"
+  document.getElementById('ticker-track').innerHTML = html + html;
+}
+
+function montarGrupos(linhas){
+  const grupos = {};
+  linhas.forEach(l => {
+    if (!grupos[l.grupo]) grupos[l.grupo] = [];
+    grupos[l.grupo].push(l);
+  });
+
+  const nomesGrupos = Object.keys(grupos).sort((a, b) => {
+    const piorA = piorStatus(grupos[a].map(x => x.status));
+    const piorB = piorStatus(grupos[b].map(x => x.status));
+    const ordem = { pendente: 0, atencao: 1, prazo: 2 };
+    if (ordem[piorA] !== ordem[piorB]) return ordem[piorA] - ordem[piorB];
+    return a.localeCompare(b);
+  });
+
+  const corpo = document.getElementById('grupos-corpo');
+  corpo.innerHTML = nomesGrupos.map((nomeGrupo, idx) => {
+    const itensGrupo = grupos[nomeGrupo].sort((a, b) => a.diasRestantes - b.diasRestantes);
+    const pior = piorStatus(itensGrupo.map(x => x.status));
+    const contagemLocal = { pendente: 0, atencao: 0, prazo: 0 };
+    itensGrupo.forEach(i => contagemLocal[i.status]++);
+
+    const resumoPartes = [];
+    if (contagemLocal.pendente) resumoPartes.push(`<span class="badge-mini pendente"></span> ${contagemLocal.pendente}`);
+    if (contagemLocal.atencao) resumoPartes.push(`<span class="badge-mini atencao"></span> ${contagemLocal.atencao}`);
+    if (contagemLocal.prazo) resumoPartes.push(`<span class="badge-mini prazo"></span> ${contagemLocal.prazo}`);
+
+    const linhasTabela = itensGrupo.map(l => `
+      <tr class="${l.status === 'pendente' ? 'linha-pendente' : l.status === 'atencao' ? 'linha-atencao' : ''}">
+        <td>
+          <div class="setor-nome">${l.setor}</div>
+          ${l.tag ? `<div class="setor-tag">TAG ${l.tag}</div>` : ''}
+        </td>
+        <td>${l.filtro || '—'}</td>
+        <td class="num">${formatarData(l.ultima)}</td>
+        <td class="num">${formatarData(l.proxima)}</td>
+        <td class="dias-num" style="color: var(--status-${l.status === 'prazo' ? 'prazo' : l.status});">
+          ${l.diasRestantes}
+        </td>
+        <td><span class="badge ${l.status}">${statusLabel(l.status)}</span></td>
+      </tr>
+    `).join('');
+
+    return `
+      <div class="grupo ${idx === 0 && pior !== 'prazo' ? 'aberto' : ''}" data-grupo="${nomeGrupo}">
+        <div class="grupo-cabecalho" onclick="this.parentElement.classList.toggle('aberto')">
+          <div class="grupo-titulo">
+            <span class="grupo-seta">▶</span>
+            <span class="badge-mini ${pior}"></span>
+            ${nomeGrupo}
+          </div>
+          <div class="grupo-resumo">${resumoPartes.join(' &nbsp; ')}</div>
+        </div>
+        <div class="grupo-corpo">
+          <table>
+            <thead>
+              <tr>
+                <th>Setor</th>
+                <th>Filtro</th>
+                <th>Última troca</th>
+                <th>Próxima troca</th>
+                <th>Dias restantes</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>${linhasTabela}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('contagem-grupos').textContent = `${nomesGrupos.length} equipamentos · ${linhas.length} pontos de filtro`;
+}
+
+async function montarHistorico(){
+  let eventos;
+  try{
+    const resp = await fetch('data/historico.json?_=' + Date.now());
+    if (!resp.ok) throw new Error();
+    eventos = await resp.json();
+  }catch(e){
+    return; // sem histórico ainda, painel permanece oculto
+  }
+
+  if (!eventos || eventos.length === 0) return;
+
+  const contagemPorMes = {};
+  eventos.forEach(ev => {
+    if (!ev.data_troca) return;
+    const chave = ev.data_troca.slice(0, 7); // AAAA-MM
+    contagemPorMes[chave] = (contagemPorMes[chave] || 0) + 1;
+  });
+
+  const meses = Object.keys(contagemPorMes).sort();
+  if (meses.length === 0) return;
+
+  const maximo = Math.max(...meses.map(m => contagemPorMes[m]));
+  const nomesMes = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+  const grafico = document.getElementById('grafico-corpo');
+  grafico.innerHTML = `<div class="grafico-barras">${meses.map(m => {
+    const [ano, mes] = m.split('-');
+    const valor = contagemPorMes[m];
+    const alturaPct = Math.max((valor / maximo) * 100, 4);
+    return `
+      <div class="barra-col">
+        <div class="barra-valor">${valor}</div>
+        <div class="barra" style="height:${alturaPct}%"></div>
+        <div class="barra-label">${nomesMes[parseInt(mes,10)-1]}/${ano.slice(2)}</div>
+      </div>
+    `;
+  }).join('')}</div>`;
+
+  document.getElementById('painel-historico').style.display = '';
+}
+
+function montarAlertaEstoque(linhas, estoque){
+  if (!estoque || estoque.length === 0) return;
+
+  const totalEstoque = estoque.reduce((soma, e) => soma + (Number(e.quantidade) || 0), 0);
+  const trocasProximos30Dias = linhas.filter(l => l.diasRestantes <= JANELA_ESTOQUE_DIAS).length;
+
+  if (trocasProximos30Dias === 0) return;
+
+  const el = document.getElementById('alerta-estoque');
+  const texto = document.getElementById('alerta-estoque-texto');
+
+  if (totalEstoque < trocasProximos30Dias){
+    el.classList.add('critico');
+    texto.innerHTML = `Estoque pode não ser suficiente: há <b>${trocasProximos30Dias}</b> troca(s) prevista(s) para os próximos ${JANELA_ESTOQUE_DIAS} dias, mas o estoque atual soma <b>${totalEstoque}</b> filtro(s). <br><span style="font-size:11px;opacity:0.8;">Estimativa aproximada — considera o total de filtros em estoque, sem diferenciar por medida/modelo.</span>`;
+  } else {
+    texto.innerHTML = `<b>${trocasProximos30Dias}</b> troca(s) prevista(s) para os próximos ${JANELA_ESTOQUE_DIAS} dias · estoque atual: <b>${totalEstoque}</b> filtro(s).`;
+  }
+  el.style.display = 'flex';
+}
+
+async function carregar(){
+  document.getElementById('data-hoje').textContent = formatarData(new Date());
+
+  let payload;
+  try{
+    const resp = await fetch('data/latest.json?_=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    payload = await resp.json();
+  }catch(e){
+    document.getElementById('main').innerHTML =
+      '<div class="erro">Não foi possível carregar os dados (data/latest.json). ' +
+      'Verifique se o arquivo já foi processado pelo GitHub Actions.</div>';
+    return;
+  }
+
+  const hoje = new Date();
+  document.getElementById('dado-atualizado').textContent =
+    'planilha de ' + formatarData(parseISODate(payload.gerado_em));
+
+  const linhas = payload.itens.map(item => {
+    const ultima = parseISODate(item.ultima_troca);
+    const proxima = addDias(ultima, item.frequencia_dias);
+    const diasRestantes = diffDias(new Date(proxima), new Date(hoje));
+    const status = statusDe(diasRestantes);
+    return { ...item, ultima, proxima, diasRestantes, status };
+  });
+
+  const contagem = { pendente: 0, atencao: 0, prazo: 0 };
+  linhas.forEach(l => contagem[l.status]++);
+  document.getElementById('kpi-pendente').textContent = contagem.pendente;
+  document.getElementById('kpi-atencao').textContent = contagem.atencao;
+  document.getElementById('kpi-prazo').textContent = contagem.prazo;
+
+  const linhasOrdenadas = [...linhas].sort((a, b) => a.diasRestantes - b.diasRestantes);
+
+  montarTicker(linhasOrdenadas, contagem, payload.gerado_em);
+  montarGrupos(linhas);
+  montarAlertaEstoque(linhas, payload.estoque_filtros);
+  montarHistorico();
+
+  if (payload.estoque_filtros && payload.estoque_filtros.length){
+    document.getElementById('painel-estoque').style.display = '';
+    document.getElementById('estoque-corpo').innerHTML = payload.estoque_filtros.map(e => `
+      <div class="estoque-item">
+        <div>
+          <div class="estoque-desc">${e.descricao || '—'}</div>
+          <div class="estoque-medida">${e.medida || ''}</div>
+        </div>
+        <div class="estoque-qtd">${e.quantidade ?? '—'}</div>
+      </div>
+    `).join('');
+  }
+}
+
+carregar();
+setInterval(carregar, 1000 * 60 * 60); // reavalia a cada hora (o dia pode virar)
+</script>
+
+</body>
+</html>
