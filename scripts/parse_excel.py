@@ -95,18 +95,55 @@ def grupo_de(setor_nome):
     return setor_nome
 
 
-def parse_estoque(ws):
+ESTOQUE_MANUAL_PATH = DATA_DIR / "estoque.json"
+
+
+def parse_estoque_planilha(wb):
+    """Procura uma aba cujo nome contenha 'ESTOQUE' com as colunas
+    MODELO (ou FILTRO) e QUANTIDADE (ou QUANT.). Retorna None se não achar."""
+    aba = next((wb[n] for n in wb.sheetnames if "ESTOQUE" in n.upper()), None)
+    if aba is None:
+        return None
+
+    col_modelo = col_qtd = None
+    linha_cab = None
+    for row in aba.iter_rows(min_row=1, max_row=10):
+        for c in row:
+            texto = str(c.value).strip().upper() if c.value is not None else ""
+            if texto in ("MODELO", "FILTRO"):
+                col_modelo, linha_cab = c.column, c.row
+            elif texto.startswith("QUANT"):
+                col_qtd = c.column
+        if col_modelo and col_qtd:
+            break
+    if not (col_modelo and col_qtd):
+        print(f"Aviso: aba '{aba.title}' encontrada, mas sem colunas MODELO e QUANTIDADE")
+        return None
+
     estoque = []
-    for row in ws.iter_rows(min_row=5, max_row=ws.max_row, min_col=3, max_col=5):
-        quant, medida, descricao = (c.value for c in row)
-        if quant is None and medida is None and descricao is None:
+    for r in range(linha_cab + 1, aba.max_row + 1):
+        modelo = aba.cell(row=r, column=col_modelo).value
+        if modelo is None or str(modelo).strip() == "":
             continue
+        qtd = aba.cell(row=r, column=col_qtd).value
         estoque.append({
-            "quantidade": quant,
-            "medida": medida,
-            "descricao": descricao,
+            "modelo": str(modelo).strip(),
+            "quantidade": qtd if isinstance(qtd, (int, float)) else None,
         })
     return estoque
+
+
+def carregar_estoque(wb):
+    """Planilha tem prioridade; se não tiver a aba de estoque, usa data/estoque.json."""
+    estoque = parse_estoque_planilha(wb)
+    if estoque is not None:
+        print(f"Estoque lido da planilha: {len(estoque)} modelo(s)")
+        return estoque, "planilha"
+    if ESTOQUE_MANUAL_PATH.exists():
+        estoque = json.loads(ESTOQUE_MANUAL_PATH.read_text(encoding="utf-8"))
+        print(f"Estoque lido de data/estoque.json: {len(estoque)} modelo(s)")
+        return estoque, "manual"
+    return [], None
 
 
 def atualizar_historico(itens_novos, hoje_iso):
@@ -158,7 +195,7 @@ def main():
     wb = openpyxl.load_workbook(excel_path, data_only=True, keep_vba=True)
 
     itens = parse_geral(wb["GERAL"])
-    estoque = parse_estoque(wb["Plan4"]) if "Plan4" in wb.sheetnames else []
+    estoque, origem_estoque = carregar_estoque(wb)
 
     today = datetime.now().strftime("%Y-%m-%d")
 
@@ -169,7 +206,8 @@ def main():
         "gerado_em": today,
         "arquivo_origem": excel_path.name,
         "itens": itens,
-        "estoque_filtros": estoque,
+        "estoque_por_modelo": estoque,
+        "estoque_origem": origem_estoque,
     }
 
     (DATA_DIR / "latest.json").write_text(
@@ -179,7 +217,7 @@ def main():
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    print(f"OK: {len(itens)} itens e {len(estoque)} linhas de estoque gravados em data/latest.json")
+    print(f"OK: {len(itens)} itens e {len(estoque)} modelo(s) de estoque gravados em data/latest.json")
     print(f"Histórico: {eventos_novos} nova(s) troca(s) registrada(s), {len(historico)} evento(s) no total")
 
 
