@@ -532,6 +532,7 @@
           <th>Modelo</th>
           <th>Usado em</th>
           <th>Em estoque</th>
+          <th id="estoque-cab-minmax">Mín / Máx</th>
           <th>Trocas previstas</th>
           <th>Situação</th>
         </tr>
@@ -610,6 +611,9 @@ function montarTicker(linhas, contagem, gerado_em, analiseEstoque){
 
   (analiseEstoque || []).filter(m => m.situacao === 'falta').forEach(m => {
     itens.push(`<span class="ticker-item"><span class="ticker-dot pendente"></span>ESTOQUE ${m.modelo} — <span class="ticker-val pendente">${m.quantidade} em estoque, ${m.previstas} trocas previstas</span></span>`);
+  });
+  (analiseEstoque || []).filter(m => m.situacao === 'abaixo_min').forEach(m => {
+    itens.push(`<span class="ticker-item"><span class="ticker-dot atencao"></span>ESTOQUE ${m.modelo} — <span class="ticker-val atencao">${m.quantidade} de mínimo ${m.minimo}</span></span>`);
   });
 
   const html = itens.join('');
@@ -780,22 +784,34 @@ function analisarEstoque(linhas, estoque){
     if (l.diasRestantes <= JANELA_ESTOQUE_DIAS) porModelo[k].previstas++;
   });
 
+  const num = v => (v === null || v === undefined || v === '') ? null : Number(v);
+
   (estoque || []).forEach(e => {
     const k = chaveModelo(e.modelo);
     if (!k) return;
     if (!porModelo[k]) porModelo[k] = { modelo: e.modelo, quantidade: null, previstas: 0, grupos: new Set() };
-    porModelo[k].quantidade = (e.quantidade === null || e.quantidade === undefined || e.quantidade === '')
-      ? null : Number(e.quantidade);
+    Object.assign(porModelo[k], {
+      quantidade: num(e.quantidade),
+      minimo: num(e.minimo),
+      maximo: num(e.maximo),
+      codigo: e.codigo || null,
+      local: e.local || null,
+    });
   });
 
+  // Situação, da mais grave para a menos grave:
+  //  falta      -> o estoque não cobre as trocas dos próximos 30 dias
+  //  abaixo_min -> cobre as trocas, mas está abaixo do estoque mínimo da prateleira
+  //  ok / sem_info
   return Object.values(porModelo).map(m => {
     let situacao;
     if (m.quantidade === null) situacao = 'sem_info';
     else if (m.quantidade < m.previstas) situacao = 'falta';
+    else if (m.minimo !== null && m.minimo !== undefined && m.quantidade < m.minimo) situacao = 'abaixo_min';
     else situacao = 'ok';
     return { ...m, grupos: [...m.grupos].sort(), faltam: Math.max(m.previstas - (m.quantidade || 0), 0), situacao };
   }).sort((a, b) => {
-    const ordem = { falta: 0, ok: 1, sem_info: 2 };
+    const ordem = { falta: 0, abaixo_min: 1, ok: 2, sem_info: 3 };
     if (ordem[a.situacao] !== ordem[b.situacao]) return ordem[a.situacao] - ordem[b.situacao];
     return a.modelo.localeCompare(b.modelo);
   });
@@ -805,35 +821,57 @@ function montarAlertaEstoque(analise){
   const el = document.getElementById('alerta-estoque');
   const texto = document.getElementById('alerta-estoque-texto');
   const emFalta = analise.filter(m => m.situacao === 'falta');
+  const abaixoMin = analise.filter(m => m.situacao === 'abaixo_min');
 
-  if (emFalta.length === 0){
+  if (emFalta.length === 0 && abaixoMin.length === 0){
     el.style.display = 'none';
     return;
   }
 
-  el.classList.add('critico');
-  texto.innerHTML = `Estoque insuficiente para as trocas dos próximos ${JANELA_ESTOQUE_DIAS} dias: ` +
-    emFalta.map(m => `<b>${m.modelo}</b> (${m.quantidade} em estoque, ${m.previstas} troca(s) prevista(s))`).join(' · ');
+  const partes = [];
+  if (emFalta.length){
+    partes.push(`Estoque insuficiente para as trocas dos próximos ${JANELA_ESTOQUE_DIAS} dias: ` +
+      emFalta.map(m => `<b>${m.modelo}</b> (${m.quantidade} em estoque, ${m.previstas} troca(s) prevista(s))`).join(' · '));
+  }
+  if (abaixoMin.length){
+    partes.push(`Abaixo do estoque mínimo: ` +
+      abaixoMin.map(m => `<b>${m.modelo}</b> (${m.quantidade} de mínimo ${m.minimo}${m.codigo ? ` · cód. ${m.codigo}` : ''})`).join(' · '));
+  }
+
+  el.classList.toggle('critico', emFalta.length > 0);
+  texto.innerHTML = partes.join('<br>');
   el.style.display = 'flex';
 }
 
 function montarPainelEstoque(analise, origem){
   if (analise.length === 0) return;
 
-  const rotulo = { falta: 'FALTA', ok: 'SUFICIENTE', sem_info: 'SEM INFORMAÇÃO' };
-  const classe = { falta: 'pendente', ok: 'prazo', sem_info: 'sem-info' };
+  const rotulo = { falta: 'FALTA', abaixo_min: 'ABAIXO DO MÍNIMO', ok: 'OK', sem_info: 'SEM INFORMAÇÃO' };
+  const classe = { falta: 'pendente', abaixo_min: 'atencao', ok: 'prazo', sem_info: 'sem-info' };
+  const linhaClasse = { falta: 'linha-pendente', abaixo_min: 'linha-atencao', ok: '', sem_info: '' };
+  const temMinMax = analise.some(m => m.minimo !== null && m.minimo !== undefined);
 
-  document.getElementById('estoque-corpo').innerHTML = analise.map(m => `
-    <tr class="${m.situacao === 'falta' ? 'linha-pendente' : ''}">
-      <td class="setor-nome">${m.modelo}</td>
+  document.getElementById('estoque-cab-minmax').style.display = temMinMax ? '' : 'none';
+
+  document.getElementById('estoque-corpo').innerHTML = analise.map(m => {
+    const detalhe = [m.codigo ? `cód. ${m.codigo}` : '', m.local || ''].filter(Boolean).join(' · ');
+    const minmax = (m.minimo !== null && m.minimo !== undefined)
+      ? `${m.minimo} / ${m.maximo ?? '—'}` : '—';
+    return `
+    <tr class="${linhaClasse[m.situacao]}">
+      <td>
+        <div class="setor-nome">${m.modelo}</div>
+        ${detalhe ? `<div class="setor-tag">${detalhe}</div>` : ''}
+      </td>
       <td class="setor-tag">${m.grupos.join(', ') || '—'}</td>
       <td>${m.quantidade === null
         ? '<span class="estoque-qtd vazio">não informado</span>'
         : `<span class="estoque-qtd">${m.quantidade}</span>`}</td>
+      ${temMinMax ? `<td class="num">${minmax}</td>` : ''}
       <td class="num">${m.previstas}</td>
       <td><span class="badge ${classe[m.situacao]}">${rotulo[m.situacao]}${m.situacao === 'falta' ? ` · faltam ${m.faltam}` : ''}</span></td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 
   const semInfo = analise.filter(m => m.situacao === 'sem_info').length;
   const nota = [];
