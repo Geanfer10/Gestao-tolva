@@ -174,7 +174,7 @@
   "estoque_por_modelo": [
     {
       "modelo": "AMH-EL350 SMC",
-      "quantidade": 3,
+      "quantidade": 6,
       "codigo": "31982",
       "local": "L01-0002",
       "minimo": 4,
@@ -182,7 +182,7 @@
     },
     {
       "modelo": "AMF-EL350 SMC",
-      "quantidade": 3,
+      "quantidade": 6,
       "codigo": "31981",
       "local": "L01-0003",
       "minimo": 4,
@@ -190,7 +190,7 @@
     },
     {
       "modelo": "AM-EL350 SMC",
-      "quantidade": 3,
+      "quantidade": 6,
       "codigo": "3049730",
       "local": "L01-0004",
       "minimo": 4,
