@@ -17,7 +17,9 @@ toda vez que a "ultima_troca" de um item muda em relação à execução anterio
 """
 
 import json
+import subprocess
 import sys
+import unicodedata
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -42,12 +44,40 @@ def serial_to_iso(serial):
     return (EXCEL_EPOCH + timedelta(days=int(serial))).strftime("%Y-%m-%d")
 
 
-def find_excel_file():
+def data_commit(path):
+    """Data do último commit que mexeu no arquivo (0 se não der pra saber)."""
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%ct", "--", path.name],
+            cwd=path.parent, capture_output=True, text=True, timeout=10,
+        ).stdout.strip()
+        return int(out) if out else 0
+    except Exception:
+        return 0
+
+
+def abrir_planilha():
+    """Abre a planilha mais recente de uploads/. Se houver mais de uma, tenta da
+    mais nova para a mais antiga e pula arquivos que não abrem ou não têm a aba GERAL."""
     uploads_dir = REPO_ROOT / "uploads"
-    candidates = sorted(uploads_dir.glob("*.xlsm")) + sorted(uploads_dir.glob("*.xlsx"))
-    if not candidates:
+    candidatos = list(uploads_dir.glob("*.xlsm")) + list(uploads_dir.glob("*.xlsx"))
+    if not candidatos:
         sys.exit("Nenhum arquivo .xlsm/.xlsx encontrado em uploads/")
-    return max(candidates, key=lambda p: p.stat().st_mtime)
+    if len(candidatos) > 1:
+        print("Aviso: mais de uma planilha em uploads/: " + ", ".join(p.name for p in candidatos))
+    candidatos.sort(key=lambda p: (data_commit(p), p.stat().st_mtime), reverse=True)
+
+    for caminho in candidatos:
+        try:
+            wb = openpyxl.load_workbook(caminho, data_only=True, keep_vba=True)
+        except Exception as e:
+            print(f"Ignorando {caminho.name}: não abriu como planilha ({e.__class__.__name__})")
+            continue
+        if "GERAL" not in wb.sheetnames:
+            print(f"Ignorando {caminho.name}: não tem a aba GERAL")
+            continue
+        return caminho, wb
+    sys.exit("Nenhuma planilha válida (com a aba GERAL) em uploads/")
 
 
 def parse_geral(ws):
@@ -105,32 +135,95 @@ def parse_estoque_planilha(wb):
     if aba is None:
         return None
 
-    col_modelo = col_qtd = None
+    # Acha a linha de cabeçalho e as colunas pelo nome (a ordem não importa).
+    # Obrigatórias: MODELO e QUANT. | Opcionais: CÓDIGO, LOCAL, EST. MÍN, EST. MÁX
+    cols = {}
     linha_cab = None
     for row in aba.iter_rows(min_row=1, max_row=10):
+        achados = {}
         for c in row:
-            texto = str(c.value).strip().upper() if c.value is not None else ""
-            if texto in ("MODELO", "FILTRO"):
-                col_modelo, linha_cab = c.column, c.row
-            elif texto.startswith("QUANT"):
-                col_qtd = c.column
-        if col_modelo and col_qtd:
+            campo = campo_do_cabecalho(c.value)
+            if campo and campo not in achados:
+                achados[campo] = c.column
+        if "modelo" in achados and "quantidade" in achados:
+            cols, linha_cab = achados, row[0].row
             break
-    if not (col_modelo and col_qtd):
+    if not cols:
         print(f"Aviso: aba '{aba.title}' encontrada, mas sem colunas MODELO e QUANTIDADE")
         return None
 
-    estoque = []
+    def valor(r, campo):
+        return aba.cell(row=r, column=cols[campo]).value if campo in cols else None
+
+    # O mesmo modelo pode aparecer em mais de uma linha: as quantidades são
+    # SOMADAS; código, local, mínimo e máximo vêm da primeira linha preenchida.
+    por_modelo = {}
     for r in range(linha_cab + 1, aba.max_row + 1):
-        modelo = aba.cell(row=r, column=col_modelo).value
+        modelo = valor(r, "modelo")
         if modelo is None or str(modelo).strip() == "":
             continue
-        qtd = aba.cell(row=r, column=col_qtd).value
-        estoque.append({
-            "modelo": str(modelo).strip(),
-            "quantidade": qtd if isinstance(qtd, (int, float)) else None,
-        })
-    return estoque
+        nome = " ".join(str(modelo).split())
+        chave = nome.upper().removesuffix(" SMC").strip()
+        qtd = numero(valor(r, "quantidade"))
+        extras = {
+            "codigo": texto_limpo(valor(r, "codigo")),
+            "local": texto_limpo(valor(r, "local")),
+            "minimo": numero(valor(r, "minimo")),
+            "maximo": numero(valor(r, "maximo")),
+        }
+        if chave not in por_modelo:
+            por_modelo[chave] = {"modelo": nome, "quantidade": qtd, **extras}
+            continue
+        item = por_modelo[chave]
+        if qtd is not None:
+            item["quantidade"] = (item["quantidade"] or 0) + qtd
+        for k, v in extras.items():
+            if item.get(k) is None and v is not None:
+                item[k] = v
+    return list(por_modelo.values())
+
+
+def campo_do_cabecalho(valor):
+    """Traduz o texto do cabeçalho para o nome do campo (ignora acento e ponto)."""
+    if valor is None:
+        return None
+    t = unicodedata.normalize("NFKD", str(valor)).encode("ascii", "ignore").decode()
+    t = " ".join(t.upper().replace(".", " ").split())
+    if t in ("MODELO", "FILTRO"):
+        return "modelo"
+    if t.startswith("QUANT") or t == "QTD":
+        return "quantidade"
+    if t.startswith("COD"):
+        return "codigo"
+    if t.startswith("LOCAL"):
+        return "local"
+    if "MIN" in t.split() or t.startswith("EST MIN") or t in ("MINIMO", "ESTOQUE MINIMO"):
+        return "minimo"
+    if "MAX" in t.split() or t.startswith("EST MAX") or t in ("MAXIMO", "ESTOQUE MAXIMO"):
+        return "maximo"
+    return None
+
+
+def texto_limpo(valor):
+    """Código 31982 (número) vira '31982'; vazio vira None."""
+    if valor is None or str(valor).strip() == "":
+        return None
+    if isinstance(valor, float) and valor.is_integer():
+        valor = int(valor)
+    return str(valor).strip()
+
+
+def numero(valor):
+    """Aceita 6, 6.0 ou o texto '6' digitado como texto no Excel."""
+    if isinstance(valor, (int, float)):
+        return int(valor) if float(valor).is_integer() else valor
+    if isinstance(valor, str):
+        try:
+            v = float(valor.strip().replace(",", "."))
+            return int(v) if v.is_integer() else v
+        except ValueError:
+            return None
+    return None
 
 
 def carregar_estoque(wb):
@@ -189,10 +282,8 @@ def atualizar_historico(itens_novos, hoje_iso):
 
 
 def main():
-    excel_path = find_excel_file()
+    excel_path, wb = abrir_planilha()
     print(f"Lendo: {excel_path.name}")
-
-    wb = openpyxl.load_workbook(excel_path, data_only=True, keep_vba=True)
 
     itens = parse_geral(wb["GERAL"])
     estoque, origem_estoque = carregar_estoque(wb)
