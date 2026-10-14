@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-09-28",
+  "gerado_em": "2026-10-14",
   "arquivo_origem": "GEST├âO TOLVA.xlsm",
   "itens": [
     {
@@ -8,7 +8,8 @@
       "tag": 20661,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-07"
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21927"
     },
     {
       "setor": "MESPACK A 02",
@@ -16,7 +17,8 @@
       "tag": 20661,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-07"
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21927"
     },
     {
       "setor": "MESPACK A 03",
@@ -24,7 +26,8 @@
       "tag": 20661,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-07"
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21927"
     },
     {
       "setor": "MESPACK B 01",
@@ -32,7 +35,8 @@
       "tag": 20662,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-07"
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21928"
     },
     {
       "setor": "MESPACK B 02",
@@ -40,7 +44,8 @@
       "tag": 20662,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-07"
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21928"
     },
     {
       "setor": "MESPACK B 03",
@@ -48,7 +53,8 @@
       "tag": 20662,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-07"
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21928"
     },
     {
       "setor": "MESPACK C 01",
@@ -56,7 +62,8 @@
       "tag": 20663,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20"
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16755"
     },
     {
       "setor": "MESPACK C 02",
@@ -64,7 +71,8 @@
       "tag": 20663,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20"
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16755"
     },
     {
       "setor": "MESPACK C 03",
@@ -72,7 +80,8 @@
       "tag": 20663,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20"
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16755"
     },
     {
       "setor": "MESPACK D 01",
@@ -80,7 +89,8 @@
       "tag": 20664,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-14"
+      "ultima_troca": "2026-09-14",
+      "ordem_servico": "21929"
     },
     {
       "setor": "MESPACK D 02",
@@ -88,7 +98,8 @@
       "tag": 20664,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-14"
+      "ultima_troca": "2026-09-14",
+      "ordem_servico": "21929"
     },
     {
       "setor": "MESPACK D 03",
@@ -96,7 +107,8 @@
       "tag": 20664,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-09-14"
+      "ultima_troca": "2026-09-14",
+      "ordem_servico": "21929"
     },
     {
       "setor": "MESPACK E 01",
@@ -104,7 +116,8 @@
       "tag": 20665,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20"
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16756"
     },
     {
       "setor": "MESPACK E 02",
@@ -112,7 +125,8 @@
       "tag": 20665,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20"
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16756"
     },
     {
       "setor": "MESPACK E 03",
@@ -120,7 +134,8 @@
       "tag": 20665,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20"
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16756"
     },
     {
       "setor": "MESPACK F 01",
@@ -128,7 +143,8 @@
       "tag": 20665,
       "filtro": "AMD44P-060AS SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-06-30"
+      "ultima_troca": "2026-06-30",
+      "ordem_servico": "20662"
     },
     {
       "setor": "MESPACK F 02",
@@ -136,7 +152,8 @@
       "tag": 20665,
       "filtro": "AMK44P-060AS SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-06-30"
+      "ultima_troca": "2026-06-30",
+      "ordem_servico": "20662"
     },
     {
       "setor": "MESPACK F 03",
@@ -144,7 +161,8 @@
       "tag": 20665,
       "filtro": "AM44P-060AS SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-06-30"
+      "ultima_troca": "2026-06-30",
+      "ordem_servico": "20662"
     },
     {
       "setor": "LINHA PRINCIPAL 01",
@@ -152,7 +170,8 @@
       "tag": 20666,
       "filtro": "AMH-EL650 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-08-23"
+      "ultima_troca": "2026-08-23",
+      "ordem_servico": "31283"
     },
     {
       "setor": "LINHA PRINCIPAL 02",
@@ -160,7 +179,8 @@
       "tag": 20666,
       "filtro": "AMG-EL650 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-08-23"
+      "ultima_troca": "2026-08-23",
+      "ordem_servico": "31283"
     },
     {
       "setor": "LINHA PRINCIPAL 03",
@@ -168,7 +188,8 @@
       "tag": 20666,
       "filtro": "AFF-EL37B SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-08-23"
+      "ultima_troca": "2026-08-23",
+      "ordem_servico": "31283"
     }
   ],
   "estoque_por_modelo": [
