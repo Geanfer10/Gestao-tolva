@@ -95,11 +95,14 @@ def parse_geral(ws):
         col_2025 = ws.cell(row=row, column=6).value    # F
         col_os = ws.cell(row=row, column=7).value      # G
 
-        serial_2025 = to_serial(col_2025)
-        serial_os = to_serial(col_os)
-        serials = [s for s in (serial_2025, serial_os) if s is not None]
-
-        ultima_iso = serial_to_iso(max(serials)) if serials else None
+        # A coluna G guarda o NÚMERO da ordem de serviço, não uma data.
+        # A data da última troca vem da coluna F; o MAX(F, G) da planilha só
+        # é usado como reserva quando a coluna F não tiver uma data.
+        if isinstance(col_2025, datetime):
+            ultima_iso = col_2025.strftime("%Y-%m-%d")
+        else:
+            serials = [s for s in (to_serial(col_2025), to_serial(col_os)) if s is not None]
+            ultima_iso = serial_to_iso(max(serials)) if serials else None
         setor_nome = str(setor).strip()
 
         itens.append({
@@ -109,6 +112,7 @@ def parse_geral(ws):
             "filtro": filtro,
             "frequencia_dias": frequencia,
             "ultima_troca": ultima_iso,
+            "ordem_servico": texto_limpo(col_os),
         })
         row += 1
 
@@ -272,6 +276,7 @@ def atualizar_historico(itens_novos, hoje_iso):
                 "setor": setor,
                 "grupo": item["grupo"],
                 "filtro": item["filtro"],
+                "ordem_servico": item.get("ordem_servico"),
                 "registrado_em": hoje_iso,
             })
             eventos_novos += 1

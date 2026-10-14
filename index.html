@@ -175,6 +175,23 @@
   .kpi.atencao .kpi-num{ color: var(--status-atencao); }
   .kpi.prazo .kpi-num{ color: var(--status-prazo); }
 
+  .kpi-regra{
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--texto-suave);
+    margin-top: 4px;
+  }
+
+  .grupo-vence{
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  .grupo-vence.pendente{ color: var(--status-pendente); }
+  .grupo-vence.atencao{ color: #B07D10; }
+  .grupo-vence.prazo{ color: var(--texto-suave); }
+
   .kpi-label{
     font-size: 13px;
     font-weight: 600;
@@ -463,7 +480,7 @@
     .kpis{ grid-template-columns: 1fr; }
     header{ flex-direction: column; align-items: flex-start; gap: 10px; }
     main{ padding: 20px; }
-    th:nth-child(4), td:nth-child(4){ display: none; }
+    .grupo-corpo th:nth-child(5), .grupo-corpo td:nth-child(5){ display: none; }
   }
 </style>
 </head>
@@ -491,15 +508,15 @@
   <div class="kpis">
     <div class="kpi pendente">
       <div class="kpi-num" id="kpi-pendente">0</div>
-      <div class="kpi-label">PENDENTE</div>
+      <div class="kpi-label">PENDENTE<div class="kpi-regra">vencido ou vence em até 1 dia</div></div>
     </div>
     <div class="kpi atencao">
       <div class="kpi-num" id="kpi-atencao">0</div>
-      <div class="kpi-label">ATENÇÃO</div>
+      <div class="kpi-label">ATENÇÃO<div class="kpi-regra">vence em menos de 20 dias</div></div>
     </div>
     <div class="kpi prazo">
       <div class="kpi-num" id="kpi-prazo">0</div>
-      <div class="kpi-label">DENTRO DO PRAZO</div>
+      <div class="kpi-label">DENTRO DO PRAZO<div class="kpi-regra">20 dias ou mais</div></div>
     </div>
   </div>
 
@@ -607,6 +624,11 @@ function montarTicker(linhas, contagem, gerado_em, analiseEstoque){
 
   if (urgentes.length === 0){
     itens.push(`<span class="ticker-item"><span class="ticker-dot prazo"></span>Nenhum item pendente ou em atenção no momento ✓</span>`);
+    // mostra as próximas trocas, da mais próxima para a mais distante
+    const vistos = new Set();
+    linhas.filter(l => !vistos.has(l.grupo) && vistos.add(l.grupo)).slice(0, 3).forEach(l => {
+      itens.push(`<span class="ticker-item"><span class="ticker-dot prazo"></span>PRÓXIMA TROCA ${l.grupo} — <span class="ticker-val prazo">${l.diasRestantes}d · ${formatarData(l.proxima)}</span></span>`);
+    });
   }
 
   (analiseEstoque || []).filter(m => m.situacao === 'falta').forEach(m => {
@@ -657,13 +679,11 @@ function montarGrupos(linhas){
     grupos[l.grupo].push(l);
   });
 
-  const nomesGrupos = Object.keys(grupos).sort((a, b) => {
-    const piorA = piorStatus(grupos[a].map(x => x.status));
-    const piorB = piorStatus(grupos[b].map(x => x.status));
-    const ordem = { pendente: 0, atencao: 1, prazo: 2 };
-    if (ordem[piorA] !== ordem[piorB]) return ordem[piorA] - ordem[piorB];
-    return a.localeCompare(b);
-  });
+  // Ordena pelo vencimento mais próximo: quem vence primeiro (ou já venceu) fica em cima
+  const maisProximo = nome => Math.min(...grupos[nome].map(x => x.diasRestantes));
+  const nomesGrupos = Object.keys(grupos).sort((a, b) =>
+    (maisProximo(a) - maisProximo(b)) || a.localeCompare(b)
+  );
 
   const corpo = document.getElementById('grupos-corpo');
   corpo.innerHTML = nomesGrupos.map((nomeGrupo, idx) => {
@@ -672,7 +692,14 @@ function montarGrupos(linhas){
     const contagemLocal = { pendente: 0, atencao: 0, prazo: 0 };
     itensGrupo.forEach(i => contagemLocal[i.status]++);
 
-    const resumoPartes = [];
+    const proximo = itensGrupo[0];
+    const textoVence = proximo.diasRestantes < 0
+      ? `venceu há ${Math.abs(proximo.diasRestantes)} dia(s)`
+      : proximo.diasRestantes === 0
+        ? 'vence hoje'
+        : `vence em ${proximo.diasRestantes} dia(s) · ${formatarData(proximo.proxima)}`;
+
+    const resumoPartes = [`<span class="grupo-vence ${pior}">${textoVence}</span>`];
     if (contagemLocal.pendente) resumoPartes.push(`<span class="badge-mini pendente"></span> ${contagemLocal.pendente}`);
     if (contagemLocal.atencao) resumoPartes.push(`<span class="badge-mini atencao"></span> ${contagemLocal.atencao}`);
     if (contagemLocal.prazo) resumoPartes.push(`<span class="badge-mini prazo"></span> ${contagemLocal.prazo}`);
@@ -684,6 +711,7 @@ function montarGrupos(linhas){
           ${l.tag ? `<div class="setor-tag">TAG ${l.tag}</div>` : ''}
         </td>
         <td>${l.filtro || '—'}</td>
+        <td class="num">${l.ordem_servico ? l.ordem_servico : '—'}</td>
         <td class="num">${formatarData(l.ultima)}</td>
         <td class="num">${formatarData(l.proxima)}</td>
         <td class="dias-num" style="color: var(--status-${l.status === 'prazo' ? 'prazo' : l.status});">
@@ -694,7 +722,7 @@ function montarGrupos(linhas){
     `).join('');
 
     return `
-      <div class="grupo ${idx === 0 && pior !== 'prazo' ? 'aberto' : ''}" data-grupo="${nomeGrupo}">
+      <div class="grupo ${idx === 0 ? 'aberto' : ''}" data-grupo="${nomeGrupo}">
         <div class="grupo-cabecalho" onclick="this.parentElement.classList.toggle('aberto')">
           <div class="grupo-titulo">
             <span class="grupo-seta">▶</span>
@@ -709,6 +737,7 @@ function montarGrupos(linhas){
               <tr>
                 <th>Setor</th>
                 <th>Filtro</th>
+                <th>OS</th>
                 <th>Última troca</th>
                 <th>Próxima troca</th>
                 <th>Dias restantes</th>
