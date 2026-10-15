@@ -116,8 +116,8 @@
       "tag": 20665,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20",
-      "ordem_servico": "16756"
+      "ultima_troca": "2026-10-15",
+      "ordem_servico": "23956"
     },
     {
       "setor": "MESPACK E 02",
@@ -125,8 +125,8 @@
       "tag": 20665,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20",
-      "ordem_servico": "16756"
+      "ultima_troca": "2026-10-15",
+      "ordem_servico": "23956"
     },
     {
       "setor": "MESPACK E 03",
@@ -134,8 +134,8 @@
       "tag": 20665,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20",
-      "ordem_servico": "16756"
+      "ultima_troca": "2026-10-15",
+      "ordem_servico": "23956"
     },
     {
       "setor": "MESPACK F 01",
