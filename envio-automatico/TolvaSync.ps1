@@ -65,7 +65,8 @@ function Preparar-Rede {
 function Ler-Token {
     if (-not (Test-Path $ArqToken)) { throw 'Token do GitHub não configurado. Rode o instalar.bat.' }
     # O token fica criptografado com a conta do Windows (só este usuário, neste PC, consegue ler)
-    $seguro = Get-Content -Path $ArqToken -Raw | ConvertTo-SecureString
+    # .Trim(): o arquivo termina com quebra de linha, que o ConvertTo-SecureString não aceita
+    $seguro = (Get-Content -Path $ArqToken -Raw).Trim() | ConvertTo-SecureString
     $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($seguro)
     try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
     finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
@@ -251,8 +252,9 @@ function Instalar {
 
     # Testa se o token enxerga o repositório
     Preparar-Rede
+    $cabTeste = Cabecalhos (Ler-Token)
     try {
-        Invoke-RestMethod -Method Get -Uri $ApiBase -Headers (Cabecalhos (Ler-Token)) | Out-Null
+        Invoke-RestMethod -Method Get -Uri $ApiBase -Headers $cabTeste | Out-Null
     } catch {
         Remove-Item $ArqToken -Force -ErrorAction SilentlyContinue
         $cod = Codigo-Http $_
