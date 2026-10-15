@@ -1,0 +1,270 @@
+{
+  "gerado_em": "2026-10-15",
+  "arquivo_origem": "GESTAO_TOLVA.xlsm",
+  "itens": [
+    {
+      "setor": "MESPACK A 01",
+      "grupo": "MESPACK A",
+      "tag": 20661,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21927"
+    },
+    {
+      "setor": "MESPACK A 02",
+      "grupo": "MESPACK A",
+      "tag": 20661,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21927"
+    },
+    {
+      "setor": "MESPACK A 03",
+      "grupo": "MESPACK A",
+      "tag": 20661,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21927"
+    },
+    {
+      "setor": "MESPACK B 01",
+      "grupo": "MESPACK B",
+      "tag": 20662,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21928"
+    },
+    {
+      "setor": "MESPACK B 02",
+      "grupo": "MESPACK B",
+      "tag": 20662,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21928"
+    },
+    {
+      "setor": "MESPACK B 03",
+      "grupo": "MESPACK B",
+      "tag": 20662,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-07",
+      "ordem_servico": "21928"
+    },
+    {
+      "setor": "MESPACK C 01",
+      "grupo": "MESPACK C",
+      "tag": 20663,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16755"
+    },
+    {
+      "setor": "MESPACK C 02",
+      "grupo": "MESPACK C",
+      "tag": 20663,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16755"
+    },
+    {
+      "setor": "MESPACK C 03",
+      "grupo": "MESPACK C",
+      "tag": 20663,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16755"
+    },
+    {
+      "setor": "MESPACK D 01",
+      "grupo": "MESPACK D",
+      "tag": 20664,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-14",
+      "ordem_servico": "21929"
+    },
+    {
+      "setor": "MESPACK D 02",
+      "grupo": "MESPACK D",
+      "tag": 20664,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-14",
+      "ordem_servico": "21929"
+    },
+    {
+      "setor": "MESPACK D 03",
+      "grupo": "MESPACK D",
+      "tag": 20664,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-09-14",
+      "ordem_servico": "21929"
+    },
+    {
+      "setor": "MESPACK E 01",
+      "grupo": "MESPACK E",
+      "tag": 20665,
+      "filtro": "AMH-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16756"
+    },
+    {
+      "setor": "MESPACK E 02",
+      "grupo": "MESPACK E",
+      "tag": 20665,
+      "filtro": "AMF-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16756"
+    },
+    {
+      "setor": "MESPACK E 03",
+      "grupo": "MESPACK E",
+      "tag": 20665,
+      "filtro": "AM-EL350 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-04-20",
+      "ordem_servico": "16756"
+    },
+    {
+      "setor": "MESPACK F 01",
+      "grupo": "MESPACK F",
+      "tag": 20665,
+      "filtro": "AMD44P-060AS SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-06-30",
+      "ordem_servico": "20662"
+    },
+    {
+      "setor": "MESPACK F 02",
+      "grupo": "MESPACK F",
+      "tag": 20665,
+      "filtro": "AMK44P-060AS SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-06-30",
+      "ordem_servico": "20662"
+    },
+    {
+      "setor": "MESPACK F 03",
+      "grupo": "MESPACK F",
+      "tag": 20665,
+      "filtro": "AM44P-060AS SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-06-30",
+      "ordem_servico": "20662"
+    },
+    {
+      "setor": "LINHA PRINCIPAL 01",
+      "grupo": "LINHA PRINCIPAL",
+      "tag": 20666,
+      "filtro": "AMH-EL650 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-08-23",
+      "ordem_servico": "31283"
+    },
+    {
+      "setor": "LINHA PRINCIPAL 02",
+      "grupo": "LINHA PRINCIPAL",
+      "tag": 20666,
+      "filtro": "AMG-EL650 SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-08-23",
+      "ordem_servico": "31283"
+    },
+    {
+      "setor": "LINHA PRINCIPAL 03",
+      "grupo": "LINHA PRINCIPAL",
+      "tag": 20666,
+      "filtro": "AFF-EL37B SMC",
+      "frequencia_dias": 182,
+      "ultima_troca": "2026-08-23",
+      "ordem_servico": "31283"
+    }
+  ],
+  "estoque_por_modelo": [
+    {
+      "modelo": "AMH-EL350 SMC",
+      "quantidade": 6,
+      "codigo": "31982",
+      "local": "L01-0002",
+      "minimo": 4,
+      "maximo": 6
+    },
+    {
+      "modelo": "AMF-EL350 SMC",
+      "quantidade": 6,
+      "codigo": "31981",
+      "local": "L01-0003",
+      "minimo": 4,
+      "maximo": 6
+    },
+    {
+      "modelo": "AM-EL350 SMC",
+      "quantidade": 6,
+      "codigo": "3049730",
+      "local": "L01-0004",
+      "minimo": 4,
+      "maximo": 6
+    },
+    {
+      "modelo": "AFF-EL37B SMC",
+      "quantidade": 2,
+      "codigo": "3049834",
+      "local": "L01-0005",
+      "minimo": 1,
+      "maximo": 2
+    },
+    {
+      "modelo": "AMG-EL650 SMC",
+      "quantidade": 2,
+      "codigo": "3049835",
+      "local": "L01-0006",
+      "minimo": 1,
+      "maximo": 2
+    },
+    {
+      "modelo": "AMH-EL650 SMC",
+      "quantidade": 2,
+      "codigo": "3049836",
+      "local": "L01-0007",
+      "minimo": 1,
+      "maximo": 2
+    },
+    {
+      "modelo": "AMD44P-060AS SMC",
+      "quantidade": 2,
+      "codigo": "31500",
+      "local": "L01-0008",
+      "minimo": 2,
+      "maximo": 2
+    },
+    {
+      "modelo": "AMK44P-060AS SMC",
+      "quantidade": 1,
+      "codigo": "31501",
+      "local": "L01-0009",
+      "minimo": 1,
+      "maximo": 1
+    },
+    {
+      "modelo": "AM44P-060AS SMC",
+      "quantidade": 1,
+      "codigo": "31502",
+      "local": "L01-0010",
+      "minimo": 1,
+      "maximo": 1
+    }
+  ],
+  "estoque_origem": "planilha"
+}
