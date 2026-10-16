@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-10-15",
+  "gerado_em": "2026-10-16",
   "arquivo_origem": "GESTAO_TOLVA.xlsm",
   "itens": [
     {
@@ -62,8 +62,8 @@
       "tag": 20663,
       "filtro": "AMH-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20",
-      "ordem_servico": "16755"
+      "ultima_troca": "2026-10-15",
+      "ordem_servico": "23957"
     },
     {
       "setor": "MESPACK C 02",
@@ -71,8 +71,8 @@
       "tag": 20663,
       "filtro": "AMF-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20",
-      "ordem_servico": "16755"
+      "ultima_troca": "2026-10-15",
+      "ordem_servico": "23957"
     },
     {
       "setor": "MESPACK C 03",
@@ -80,8 +80,8 @@
       "tag": 20663,
       "filtro": "AM-EL350 SMC",
       "frequencia_dias": 182,
-      "ultima_troca": "2026-04-20",
-      "ordem_servico": "16755"
+      "ultima_troca": "2026-10-15",
+      "ordem_servico": "23957"
     },
     {
       "setor": "MESPACK D 01",

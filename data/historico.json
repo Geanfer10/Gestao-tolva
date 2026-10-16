@@ -232,5 +232,29 @@
     "filtro": "AM-EL350 SMC",
     "ordem_servico": "23956",
     "registrado_em": "2026-10-15"
+  },
+  {
+    "data_troca": "2026-10-15",
+    "setor": "MESPACK C 01",
+    "grupo": "MESPACK C",
+    "filtro": "AMH-EL350 SMC",
+    "ordem_servico": "23957",
+    "registrado_em": "2026-10-16"
+  },
+  {
+    "data_troca": "2026-10-15",
+    "setor": "MESPACK C 02",
+    "grupo": "MESPACK C",
+    "filtro": "AMF-EL350 SMC",
+    "ordem_servico": "23957",
+    "registrado_em": "2026-10-16"
+  },
+  {
+    "data_troca": "2026-10-15",
+    "setor": "MESPACK C 03",
+    "grupo": "MESPACK C",
+    "filtro": "AM-EL350 SMC",
+    "ordem_servico": "23957",
+    "registrado_em": "2026-10-16"
   }
 ]
